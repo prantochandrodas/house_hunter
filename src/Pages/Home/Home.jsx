@@ -1,4 +1,5 @@
 import { useQuery } from "react-query";
+import AllRooms from "./AllRooms/AllRooms";
 
 const Home = () => {
     const id = localStorage.getItem('loginId')
@@ -10,14 +11,16 @@ const Home = () => {
             return data;
         }
     });
-  
+   
+ 
     if (isLoading) {
         return <p>loading...</p>
     }
     return (
         <div>
-            <p>This is home</p>
+           <AllRooms></AllRooms>
         </div>
+
     );
 };
 

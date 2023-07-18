@@ -1,14 +1,78 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useQuery } from "react-query";
+import { useNavigate } from "react-router-dom";
 
 const AddNewHouse = () => {
+    const natigate = useNavigate();
+    const [loading,setLoading]=useState(false);
+    const [adderror,setError]=useState(false);
+    const id = localStorage.getItem('loginId')
+    const { data: user = [], isLoading } = useQuery({
+        queryKey: ['user'],
+        queryFn: async () => {
+            const res = await fetch(`http://localhost:5000/User?id=${id}`);
+            const data = await res.json();
+            return data;
+        }
+    });
     const { register, handleSubmit, formState: { errors } } = useForm();
+    const imgHostKey = import.meta.env.VITE_imgbb_key;
     const handelData = (data) => {
-        console.log(data);
+        setLoading(true)
+        const image = data.picture[0];
+        const formData = new FormData();
+        formData.append("image", image);
+        const url = `https://api.imgbb.com/1/upload?key=${imgHostKey}`;
+        fetch(url, {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.json())
+            .then(imageData => {
+                const addData = {
+                    bathRoom: data.bathRoom,
+                    bedrooms: data.bedrooms,
+                    city: data.city,
+                    description: data.description,
+                    name: data.name,
+                    phone: data.phone,
+                    picture: imageData.data.url,
+                    rent: data.rent,
+                    roomSize: data.roomSize,
+                    email: user?.email
+                }
+                fetch('http://localhost:5000/addRoom', {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(addData)
+                })
+                    .then(res => res.json())
+                    .then(result => {
+                        setLoading(false);
+                        console.log(result)
+                        natigate('/')
+                    })
+                    .catch(error => {
+                        setLoading(false);
+                        setError('There is an error Please try again')
+                    })
+            })
+    }
+
+
+    if (loading) {
+        return <p>Loading ...</p>
     }
     return (
         <div>
             <section className="max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-gray-800">
                 <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white">Add House For Rent</h2>
+                {
+                    adderror && <p className="text-red-500 text-center">{adderror}</p>
+                }
                 <form onSubmit={handleSubmit(handelData)}>
                     <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
                         {/* name */}
@@ -81,7 +145,12 @@ const AddNewHouse = () => {
                         {/* phone*/}
                         <div>
                             <label className="text-gray-700 dark:text-gray-200" htmlFor="phone">Phone Number</label>
-                            <input name="phone" {...register("phone", { required: "Phone number is required" })} id="phone" type="number" className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" />
+                            <input name="phone" {...register("phone", {
+                                required: "Phone number is required", pattern: {
+                                    value: /(^(\+88|0088)?(01){1}[3456789]{1}(\d){8})$/,
+                                    message: "Number have to valid"
+                                }
+                            })} id="phone" type="number" className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" />
                             {errors.phone && <p className='text-red-600'>{errors.phone?.message}</p>}
                         </div>
 

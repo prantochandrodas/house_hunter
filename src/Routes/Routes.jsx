@@ -5,6 +5,8 @@ import SignUp from "../Pages/SignUp/SignUp";
 import SignIn from "../Pages/SignIn/SignIn";
 import AddNewHouse from "../Pages/AddNewHouse/AddNewHouse";
 import PrivetRoute from "./PrivetRoute";
+import MyHouses from "../Pages/MyHouses/MyHouses";
+import GetHouseInfo from "../Pages/GetHouseInfo/GetHouseInfo";
 
 export const router = createBrowserRouter([
     {
@@ -18,6 +20,15 @@ export const router = createBrowserRouter([
         {
           path:'/addNewHose',
           element:<AddNewHouse></AddNewHouse>
+        },
+        {
+          path:'/myHouses',
+          element:<MyHouses></MyHouses>,
+        },
+        {
+          path:'/getHouseInfoById/:id',
+          element:<GetHouseInfo></GetHouseInfo>,
+          loader:({params})=>fetch(`http://localhost:5000/getHouseInfoById/${params.id}`)
         }
       ]
     },
