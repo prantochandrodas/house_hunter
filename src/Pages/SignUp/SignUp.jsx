@@ -1,15 +1,52 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CiPhone } from "react-icons/ci";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 const SignUp = () => {
+    const [loading,setLoading]=useState(false);
+    const [signUpError,setSignUpError]=useState('');
+    const navigate=useNavigate();
     const { register, handleSubmit, formState: { errors } } = useForm();
     const handelSignUp=(data)=>{
+        setLoading(true)
         console.log(data)
+        const user={
+            name:data.fullName,
+            role:data.role,
+            email:data.email,
+            password:data.password,
+            loginStatus:true
+        }
+        fetch('http://localhost:5000/addUser', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(user)
+        })
+            .then(res => res.json())
+            .then(result => {
+                console.log(result);
+                if(result.acknowledged==true){
+                    localStorage.setItem('loginId',result.insertedId);
+                    setLoading(false);
+                    navigate('/')
+                }
+                if (result == false) {
+                    setSignUpError('User email already exist')
+                    setLoading(false);
+                } 
+            })
+    }
+
+    if(loading){
+        return <p>loading...</p>
     }
     return (
         <div>
-            <section className="bg-white dark:bg-gray-900">
+            <section className="bg-white dark:bg-gray-900 py-10">
                 <div className="container flex items-center justify-center min-h-screen px-6 mx-auto">
+                    
                     <form onSubmit={handleSubmit(handelSignUp)} className="w-full max-w-md">
                         <div className="flex justify-center mx-auto">
                             <img className="w-auto h-7 sm:h-8" src="https://merakiui.com/images/logo.svg" alt />
@@ -22,7 +59,9 @@ const SignUp = () => {
                                 sign up
                             </NavLink>
                         </div>
+                        <p className="text-red-500 text-center my-4">{signUpError&& signUpError}</p>
                         {/* user name */}
+
                         <div className="relative flex items-center mt-8">
                             <span className="absolute">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 mx-3 text-gray-300 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -39,8 +78,8 @@ const SignUp = () => {
                             </label>
                             <select {...register("role",{required:'role is required'})} name="role" id="role" className="mt-1.5 w-full rounded-md py-3 border border-gray-300 text-gray-700 sm:text-sm">
                                 <option value=''>Please select</option>
-                                <option value="JM">John Mayer</option>
-                                <option value="SRV">Stevie Ray Vaughn</option>
+                                <option value="HouseOwner">House Owner</option>
+                                <option value="HouseRenter">House Renter</option>
                             </select>
                         </div>
                         {errors.role && <p className='text-red-600'>{errors.role?.message}</p>}
@@ -77,9 +116,9 @@ const SignUp = () => {
                                 Sign Up
                             </button>
                             <div className="mt-6 text-center ">
-                                <a href="#" className="text-sm text-blue-500 hover:underline dark:text-blue-400">
+                                <Link to="/signin" className="text-sm text-blue-500 hover:underline dark:text-blue-400">
                                     Already have an account?
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </form>
