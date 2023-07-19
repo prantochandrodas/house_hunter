@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import './Signin.css'
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import Spinner from "../Spinner/Spinner";
 
 const SignIn = () => {
     const [loginError, setLoginError] = useState('')
@@ -11,6 +12,7 @@ const SignIn = () => {
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const handelSignIn = (data) => {
+        setLoading(true)
        const newData={
         email:data.email,
         password:data.password
@@ -40,7 +42,7 @@ const SignIn = () => {
 
     }
     if (loading) {
-        return <p>loading ...</p>
+        return <Spinner></Spinner>
     }
     return (
         <div>

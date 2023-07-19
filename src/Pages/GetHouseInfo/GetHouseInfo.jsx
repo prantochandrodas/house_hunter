@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLoaderData, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Spinner from '../Spinner/Spinner';
 
 const GetHouseInfo = () => {
+    const [loading,setLoading]=useState(false);
+    const [editError,setEditError]=useState('');
+    
     const oldData=useLoaderData();
     const natigate=useNavigate();
     const imgHostKey = import.meta.env.VITE_imgbb_key;
     // console.log(data);
     const { register, handleSubmit, formState: { errors } } = useForm();
     const handelData=(data)=>{
+        setLoading(true);
         const image = data.picture[0];
         const formData = new FormData();
         formData.append("image", image);
@@ -41,9 +47,27 @@ const GetHouseInfo = () => {
                     .then(result=>{
                         console.log(result)
                         natigate('/myHouses')
+                        setLoading(false);
                     })
-                    .catch(error=>console.log(error))
+                    .catch(error=>{
+                        toast.error('There is an error', {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            });
+                        setEditError(error.message)
+                          setLoading(false) 
+                    })
             })
+    }
+
+    if(loading){
+        return <Spinner></Spinner>
     }
     return (
         <div>

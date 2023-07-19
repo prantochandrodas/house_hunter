@@ -1,9 +1,8 @@
-import { Link } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import React, { useState } from 'react';
 import { useQuery } from 'react-query';
-import { useState } from 'react';
+import { toast } from 'react-toastify';
 
-const MyHouses = () => {
+const AllBookings = () => {
     const [loading,setLoading]=useState(false);
     const id = localStorage.getItem('loginId')
     const { data: user = []} = useQuery({
@@ -15,45 +14,40 @@ const MyHouses = () => {
         }
     });
 
-
-
-    const { data: myHouses = [] ,refetch} = useQuery({
-        queryKey: ['myHouses'],
+    const { data: myBookings = [] ,refetch} = useQuery({
+        queryKey: ['myBookings'],
         queryFn: async () => {
-            const res = await fetch(`http://localhost:5000/myHouses?email=${user?.email}`);
+            const res = await fetch(`http://localhost:5000/myBookings?email=${user?.email}`);
             const data = await res.json();
             return data;
         }
     });
-    // delete a user
-    const handelDelete = (id) => {
-        setLoading(true);
-        fetch(`http://localhost:5000/deleteRoom?id=${id}`, {
-            method: 'DELETE',
+ // delete a bookings
+ const handelDelete = (id) => {
+    setLoading(true);
+    fetch(`http://localhost:5000/deleteBooking?id=${id}`, {
+        method: 'DELETE',
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.deletedCount > 0) {
+
+                toast.error('Room Deleted', {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                });
+                refetch();
+                setLoading(false)
+            }
+
         })
-            .then(res => res.json())
-            .then(data => {
-                if (data.deletedCount > 0) {
-
-                    toast.error('Room Deleted', {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "light",
-                    });
-                    refetch();
-                    setLoading(false)
-                }
-
-            })
-    }
-    if(loading){
-        return <p>loading...</p>
-    }
+}
     return (
         <div>
             <div className="overflow-x-auto">
@@ -89,7 +83,7 @@ const MyHouses = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                         {
-                            myHouses?.map(allData => <tr key={allData._id} className="odd:bg-gray-50">
+                            myBookings?.map(allData => <tr key={allData._id} className="odd:bg-gray-50">
                                 <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
                                     {allData.name}
                                 </td>
@@ -101,7 +95,6 @@ const MyHouses = () => {
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">{allData.phone}</td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <button onClick={()=>handelDelete(allData._id)} type="button" className="px-6 py-2 font-semibold border border-red-600 rounded hover:bg-red-500 hover:text-white">Delete</button>
-                                    <Link to={`/getHouseInfoById/${allData._id}`} type="button" className="px-6 py-2 font-semibold border border-[#12AD2B] mx-2 rounded hover:bg-[#12AD2B] hover:text-white">Edit</Link>
                                 </td>
 
                             </tr>)
@@ -114,4 +107,4 @@ const MyHouses = () => {
     );
 };
 
-export default MyHouses;
+export default AllBookings;

@@ -1,9 +1,10 @@
-import React from 'react';
 import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 
 const AllRoom = ({ allRoom }) => {
     const id = localStorage.getItem('loginId')
-    const { data: user = [], isLoading } = useQuery({
+    const { data: user = [] } = useQuery({
         queryKey: ['user'],
         queryFn: async () => {
             const res = await fetch(`http://localhost:5000/User?id=${id}`);
@@ -11,6 +12,27 @@ const AllRoom = ({ allRoom }) => {
             return data;
         }
     });
+    const { data: myBookings = [] } = useQuery({
+        queryKey: ['myBookings'],
+        queryFn: async () => {
+            const res = await fetch(`http://localhost:5000/myBookings?email=${user?.email}`);
+            const data = await res.json();
+            return data;
+        }
+    });
+
+    const setErrorToast=()=>{
+        toast.error("You have already booked 2 housed can't book any", {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            });
+    }
     return (
         <div>
             <a href="#" className="block rounded-lg p-4 shadow-sm shadow-indigo-100">
@@ -57,12 +79,17 @@ const AllRoom = ({ allRoom }) => {
                     </div>
                     <p className='text-[12px] py-2'>{allRoom?.description}</p>
                     {
-                        user?.role == 'HouseRenter' ? <a href="#" className="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600">
-                           Book Now
+                        user?.role == 'HouseRenter' ? myBookings?.length >= 2 ? <button onClick={setErrorToast} className="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600">
+                            Book Now
                             <span aria-hidden="true" className="block transition-all group-hover:ms-0.5 rtl:rotate-180">
                                 →
                             </span>
-                        </a> : <></>
+                        </button> : <Link to={`/bookRooms/${allRoom._id}`} className="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600">
+                            Book Now
+                            <span aria-hidden="true" className="block transition-all group-hover:ms-0.5 rtl:rotate-180">
+                                →
+                            </span>
+                        </Link> : <></>
                     }
 
 

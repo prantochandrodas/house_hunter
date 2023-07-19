@@ -1,37 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
-import AllRoom from './AllRoom';
-import FilterData from '../../FilterData/FilterData';
-import Spinner from '../../Spinner/Spinner';
+import React, { useContext, useEffect, useState } from 'react';
+import { DataContext } from '../Context/DataProvider';
+import AllRoom from '../Home/AllRooms/AllRoom';
 
-const AllRooms = ({ currentUser,setLoading }) => {
+const ShowFilterData = () => {
+    const {city,bedrooms,bathRoom,roomSize,rent,setText,text}=useContext(DataContext);
+    console.log(city);
+    const [loading,setLoading]=useState(false);
+    const [data,setDatas]=useState([]);
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
-   
-    
-    const [allRooms, setDatas] = useState([])
-   
     useEffect(() => {
         setLoading(true);
-        fetch(`http://localhost:5000/allRooms?page=${page}&size=${size}`)
+        fetch(`http://localhost:5000/filter?page=${page}&size=${size}&city=${city}&bedrooms=${bedrooms}&roomSize=${roomSize}&rent=${rent}&bathRoom=${bathRoom}`)
             .then(res => res.json())
             .then(result => {
                 setDatas(result)
                 setLoading(false);
             })
-    }, [page, size]);
-    const newpages = Math.ceil(allRooms.count / size);
-
+    }, [page, size,rent,bedrooms,city,roomSize,bathRoom,text]);
+    const newpages = Math.ceil(data.count / size);
+    if (loading) {
+        return <p>Loading...</p>
+    }
     return (
         <div>
-            <FilterData
-                allRooms={allRooms}
-            ></FilterData>
-
-            <div className='lg:grid block lg:grid-cols-2 lg:gap-2 p-4'>
+             <div className='lg:grid block lg:grid-cols-2 lg:gap-2 p-4'>
                 {
-                    allRooms?.result?.map(allRoom => <AllRoom
-                        currentUser={currentUser}
+                    data?.result?.map(allRoom => <AllRoom
                         key={allRoom._id}
                         allRoom={allRoom}
                     ></AllRoom>)
@@ -52,4 +47,4 @@ const AllRooms = ({ currentUser,setLoading }) => {
     );
 };
 
-export default AllRooms;
+export default ShowFilterData;

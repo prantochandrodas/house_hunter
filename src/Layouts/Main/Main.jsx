@@ -6,7 +6,7 @@ import MobileNav from "../../Pages/MobileNav/MobileNav";
 const Main = () => {
     return (
         <div>
-            <div className="lg:flex hidden">
+            <div className="lg:flex  hidden">
                 <Header></Header>
                 <Outlet></Outlet>
             </div>

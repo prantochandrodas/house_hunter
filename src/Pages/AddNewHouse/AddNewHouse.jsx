@@ -2,13 +2,15 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../Spinner/Spinner";
+import { toast } from "react-toastify";
 
 const AddNewHouse = () => {
     const natigate = useNavigate();
     const [loading,setLoading]=useState(false);
     const [adderror,setError]=useState(false);
     const id = localStorage.getItem('loginId')
-    const { data: user = [], isLoading } = useQuery({
+    const { data: user = [] } = useQuery({
         queryKey: ['user'],
         queryFn: async () => {
             const res = await fetch(`http://localhost:5000/User?id=${id}`);
@@ -54,17 +56,27 @@ const AddNewHouse = () => {
                         setLoading(false);
                         console.log(result)
                         natigate('/')
+                        toast.success('room add sucessfull', {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            });
                     })
                     .catch(error => {
                         setLoading(false);
-                        setError('There is an error Please try again')
+                        setError(`${error} There is an error Please try again`)
                     })
             })
     }
 
 
     if (loading) {
-        return <p>Loading ...</p>
+        return <Spinner></Spinner>
     }
     return (
         <div>

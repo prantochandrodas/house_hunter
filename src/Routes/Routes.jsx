@@ -7,6 +7,9 @@ import AddNewHouse from "../Pages/AddNewHouse/AddNewHouse";
 import PrivetRoute from "./PrivetRoute";
 import MyHouses from "../Pages/MyHouses/MyHouses";
 import GetHouseInfo from "../Pages/GetHouseInfo/GetHouseInfo";
+import BookRooms from "../Pages/BookRooms/BookRooms";
+import AllBookings from "../Pages/AllBookings/AllBookings";
+import ShowFilterData from "../Pages/ShowFilterData/ShowFilterData";
 
 export const router = createBrowserRouter([
     {
@@ -29,6 +32,19 @@ export const router = createBrowserRouter([
           path:'/getHouseInfoById/:id',
           element:<GetHouseInfo></GetHouseInfo>,
           loader:({params})=>fetch(`http://localhost:5000/getHouseInfoById/${params.id}`)
+        },
+        {
+          path:'/bookRooms/:id',
+          element:<BookRooms></BookRooms>,
+          loader:({params})=>fetch(`http://localhost:5000/bookRooms/${params.id}`)
+        },
+        {
+          path:'/allBookings',
+          element:<AllBookings></AllBookings>
+        },
+        {
+          path:'/filterData',
+          element:<ShowFilterData></ShowFilterData>
         }
       ]
     },

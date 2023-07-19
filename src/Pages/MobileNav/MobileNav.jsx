@@ -1,22 +1,41 @@
 import React, { useState } from 'react';
+import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 
 const MobileNav = () => {
     const [state, setState] = useState(false);
+    const id = localStorage.getItem('loginId')
+    const { data: user = [], isLoading } = useQuery({
+        queryKey: ['user'],
+        queryFn: async () => {
+            const res = await fetch(`http://localhost:5000/User?id=${id}`);
+            const data = await res.json();
+            return data;
+        }
+    });
     const menu = <>
-    <Link to='/' onClick={() => setState(!state)}> <li className='lg:ml-5 text-lg lg:mt-0 mt-4  font-[500]'>Home</li></Link>
-    <Link to='/allPackage' onClick={() => setState(!state)}> <li className='lg:ml-5 text-lg lg:mt-0 mt-4 font-[500]'>All-Packages</li></Link>
-    <Link to='/booking' onClick={() => setState(!state)}> <li className='lg:ml-5 text-lg lg:mt-0 mt-4 font-[500]'>Booking</li></Link>
-</>
+        <Link to='/' onClick={() => setState(!state)}> <li className='lg:ml-5 text-lg lg:mt-0 mt-4  font-[500]'>Home</li></Link>
+        {
+            user?.role == 'HouseOwner' ? <> <Link to={`/myHouses`} onClick={() => setState(!state)}> <li className='lg:ml-5 text-lg lg:mt-0 mt-4 font-[500]'>My Houses</li></Link>
+                <Link to='/addNewHose' onClick={() => setState(!state)}> <li className='lg:ml-5 text-lg lg:mt-0 mt-4 font-[500]'>Add New house</li></Link></>
+                : <></>
+        }
+        {
+            user?.role == 'HouseRenter' ?
+                <Link to='allBookings' onClick={() => setState(!state)}> <li className='lg:ml-5 text-lg lg:mt-0 mt-4 font-[500]'>All Bookings</li></Link>
+                : <></>
+        }
+
+    </>
     return (
-        <nav className={` ${state ? 'mobileNavSticky bg-[#212121] lg:bg-[#212121] lg:text-white text-white' : 'NavSticky'} w-full  bg-[#212121] border-b md:border-0 md:static`}>
+        <nav className={` ${state ? 'mobileNavSticky bg-[#ffffff] lg:bg-[#212121]' : 'NavSticky'} w-full   bg-[#ffffff] text-black-500 border-b-2 md:border-0 md:static`}>
             <div className="items-center lg:w-[95%] lg:mx-auto px-4 max-w-screen-xl mx-auto md:flex md:px-8">
                 <div className="flex items-center justify-between py-3 md:py-5 md:block">
                     <a href="javascript:void(0)">
-                       
+                        <img src="https://merakiui.com/images/logo.svg" width={30} alt="" />
                     </a>
                     <div className="md:hidden">
-                        <button className="text-white outline-none p-2 rounded-md focus:border-gray-400 focus:border"
+                        <button className=" outline-none p-2 rounded-md focus:border-gray-400 focus:border"
                             onClick={() => setState(!state)}
                         >
                             {
@@ -41,7 +60,7 @@ const MobileNav = () => {
                 </div>
                 <div className={`md:flex md:items-center md:justify-center ${state ? 'block' : 'hidden'}`}>
                     <div className='md:my-0 my-2 flex'>
-                        
+
                     </div>
 
                 </div>

@@ -1,7 +1,10 @@
 import { useQuery } from "react-query";
 import AllRooms from "./AllRooms/AllRooms";
+import Spinner from "../Spinner/Spinner";
+import { useState } from "react";
 
 const Home = () => {
+    const [loading,setLoading]=useState(false);
     const id = localStorage.getItem('loginId')
     const { data: user = [], isLoading } = useQuery({
         queryKey: ['user'],
@@ -13,12 +16,12 @@ const Home = () => {
     });
    
  
-    if (isLoading) {
-        return <p>loading...</p>
+    if (isLoading && loading) {
+        return <Spinner></Spinner>
     }
     return (
         <div>
-           <AllRooms></AllRooms>
+           <AllRooms setLoading={setLoading}></AllRooms>
         </div>
 
     );

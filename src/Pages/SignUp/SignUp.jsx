@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CiPhone } from "react-icons/ci";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import Spinner from "../Spinner/Spinner";
 const SignUp = () => {
     const [loading,setLoading]=useState(false);
     const [signUpError,setSignUpError]=useState('');
@@ -37,10 +38,14 @@ const SignUp = () => {
                     setLoading(false);
                 } 
             })
+            .catch(error=>{
+                setSignUpError(error.message);
+                setLoading(false);
+            })
     }
 
     if(loading){
-        return <p>loading...</p>
+        return <Spinner></Spinner>
     }
     return (
         <div>
@@ -101,6 +106,8 @@ const SignUp = () => {
                             <input {...register("email", { required: "email is required" })} type="email" name="email" className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40" placeholder="Email address" />
                         </div>
                         {errors.email && <p className='text-red-600'>{errors.email?.message}</p>}
+                       
+                       
                         {/* password  */}
                         <div className="relative flex items-center mt-4">
                             <span className="absolute">
